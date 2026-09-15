@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOS Rayon — Fiche élève 1EPC</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Caveat:wght@600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf8f2;
+    --panel:#ffffff;
+    --ink:#1c2333;
+    --muted:#6b6f78;
+    --navy:#0c3477;
+
+    --pink:#ec3f7f;       --pink-bg:#ffdfea;      --pink-body:#fffafc;
+    --rose:#e0417a;       --rose-bg:#fde3ec;      --rose-body:#fffafc;
+    --blue:#159bdb;       --blue-bg:#d9f2fe;      --blue-body:#ffffff;
+    --green:#16b385;      --green-bg:#d7f9ea;     --green-body:#ffffff;
+    --orange:#f0791f;     --orange-bg:#fde7d2;    --orange-body:#fffdfa;
+    --purple:#7c4fe0;     --purple-bg:#e6e1fd;    --purple-body:#ffffff;
+    --yellow:#eaad19;     --yellow-bg:#fdf1d3;    --yellow-body:#fffefb;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#181a1f; --panel:#22252c; --ink:#f1ede4; --muted:#b7b1a1;
+      --pink-body:#22252c; --rose-body:#22252c; --blue-body:#22252c; --green-body:#22252c;
+      --orange-body:#22252c; --purple-body:#22252c; --yellow-body:#22252c;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#181a1f; --panel:#22252c; --ink:#f1ede4; --muted:#b7b1a1;
+    --pink-body:#22252c; --rose-body:#22252c; --blue-body:#22252c; --green-body:#22252c;
+    --orange-body:#22252c; --purple-body:#22252c; --yellow-body:#22252c;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Nunito', sans-serif; padding:26px 14px 130px;
+  }
+  h1,h2,.font-title{font-family:'Baloo 2', sans-serif;}
+  .hand{font-family:'Caveat', cursive;}
+  .wrap{max-width:1000px; margin:0 auto; position:relative;}
+  svg.icon{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  /* ================= HEADER ================= */
+  .header-zone{position:relative; padding:64px 118px 6px; margin-bottom:20px;}
+  @media (max-width:760px){.header-zone{padding:60px 10px 6px;}}
+
+  .corner{position:absolute; top:0; width:100px; text-align:center;}
+  .corner.left{left:0;}
+  .corner.right{right:0;}
+  .corner svg{width:46px;height:46px;}
+  .stickynote{
+    margin-top:2px; background:#fff6c4; border:1px solid #e4cf6e; border-radius:4px;
+    padding:8px 10px; font-family:'Caveat',cursive; font-weight:700; font-size:18px; color:#5c4b12;
+    line-height:1.15; box-shadow:2px 3px 4px rgba(0,0,0,.12); transform:rotate(-5deg);
+  }
+  .corner.right .stickynote{transform:rotate(4deg); background:#fff6c4;}
+  @media (max-width:760px){.corner{display:none;} .header-zone{padding-top:16px;}}
+
+  .pill{
+    display:block; margin:0 auto 14px; width:fit-content;
+    background:var(--yellow-bg); border:2px solid var(--yellow); color:#7a5c0a;
+    font-family:'Baloo 2', sans-serif; font-weight:800; font-size:14px; letter-spacing:.03em;
+    padding:7px 26px; border-radius:999px;
+  }
+  .masthead{
+    background:var(--blue-body); border:2.5px solid #a9defb; border-radius:18px;
+    padding:18px 26px 16px; text-align:center;
+  }
+  .masthead h1{
+    margin:0; font-size:clamp(21px,3.4vw,30px); font-weight:800; color:var(--navy); line-height:1.15;
+  }
+  .masthead .teacher{margin-top:8px; font-size:12.5px; color:var(--muted); font-weight:700;}
+  .masthead .teacher b{color:var(--ink);}
+  .identity{
+    border-top:2px solid #d9f0fd; margin-top:14px; padding-top:12px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+  }
+  .field label{
+    display:block; font-family:'Baloo 2',sans-serif; font-size:11px; letter-spacing:.02em;
+    color:var(--muted); font-weight:700; margin-bottom:3px;
+  }
+  .field input{
+    width:100%; font-family:inherit; font-size:14px; color:var(--ink);
+    background:var(--paper); border:1.5px solid #cfd6e0; border-radius:7px;
+    padding:6px 9px; outline:none;
+  }
+  .field input:focus{border-color:var(--blue);}
+  @media (max-width:640px){.identity{grid-template-columns:1fr 1fr;}}
+
+  /* ================= CARD SYSTEM ================= */
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;}
+  @media (max-width:760px){.grid2{grid-template-columns:1fr;}}
+
+  .card{border-radius:16px; overflow:hidden; position:relative; border:2px solid; background:#fff;}
+  .card.pink{border-color:var(--pink);}
+  .card.rose{border-color:var(--rose);}
+  .card.blue{border-color:var(--blue);}
+  .card.green{border-color:var(--green);}
+  .card.orange{border-color:var(--orange);}
+  .card.purple{border-color:var(--purple);}
+  .card.yellow{border-color:var(--yellow);}
+
+  .card-head{
+    display:flex; align-items:center; gap:10px; padding:11px 18px;
+    font-weight:700; color:var(--ink);
+  }
+  .card.pink .card-head{background:var(--pink-bg); color:#8c1148;}
+  .card.rose .card-head{background:var(--rose-bg); color:#8c1148;}
+  .card.blue .card-head{background:var(--blue-bg); color:#0b5c85;}
+  .card.green .card-head{background:var(--green-bg); color:#0c6b4f;}
+  .card.orange .card-head{background:var(--orange-bg); color:#93470a;}
+  .card.purple .card-head{background:var(--purple-bg); color:#4a2e97;}
+  .card.yellow .card-head{background:var(--yellow-bg); color:#8a670a;}
+
+  .card-head .num{
+    width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:13px;color:#fff;flex:none; font-family:'Baloo 2',sans-serif;
+  }
+  .card.pink .num, .card.rose .num{background:var(--pink);}
+  .card.blue .num{background:var(--blue);}
+  .card.green .num{background:var(--green);}
+  .card.orange .num{background:var(--orange);}
+  .card.purple .num{background:var(--purple);}
+  .card.yellow .num{background:var(--yellow);}
+  .card.rose .num{background:var(--rose);}
+
+  .card-head h2{margin:0; font-size:17px; font-weight:700;}
+  .card-body{padding:14px 18px 18px;}
+  .card.pink .card-body{background:var(--pink-body);}
+  .card.rose .card-body{background:var(--rose-body);}
+  .card.blue .card-body{background:var(--blue-body);}
+  .card.green .card-body{background:var(--green-body);}
+  .card.orange .card-body{background:var(--orange-body);}
+  .card.purple .card-body{background:var(--purple-body);}
+  .card.yellow .card-body{background:var(--yellow-body);}
+
+  ul.plain{margin:0; padding-left:20px; font-size:14px; line-height:1.85;}
+  .card p.txt{font-size:14px; line-height:1.65; margin:0;}
+
+  /* Etapes */
+  .steps{display:flex; flex-wrap:wrap; gap:10px;}
+  .step{
+    flex:1 1 150px; background:#fff; border-radius:10px; padding:10px 12px; font-size:12.5px;
+    line-height:1.4; box-shadow:0 2px 4px rgba(0,0,0,.06); display:flex; gap:8px; align-items:flex-start;
+  }
+  .step .chip{
+    width:22px;height:22px;border-radius:50%;flex:none; color:#fff; font-weight:800; font-size:12px;
+    display:flex;align-items:center;justify-content:center; font-family:'Baloo 2',sans-serif;
+  }
+  .step:nth-child(1) .chip{background:var(--pink);}
+  .step:nth-child(2) .chip{background:var(--orange);}
+  .step:nth-child(3) .chip{background:var(--purple);}
+  .step:nth-child(4) .chip{background:var(--blue);}
+  .step:nth-child(5) .chip{background:var(--green);}
+  .steps-arrow{display:flex; align-items:center; color:var(--muted); font-weight:700;}
+
+  .hanging-tag{
+    position:absolute; top:-10px; right:26px; background:#fffdf6; border:2px solid var(--ink);
+    border-radius:2px 10px 10px 10px; padding:10px 14px 12px; font-family:'Baloo 2',sans-serif;
+    font-weight:700; font-size:11px; line-height:1.55; text-align:center; color:var(--ink);
+    box-shadow:2px 3px 4px rgba(0,0,0,.12); transform:rotate(3deg);
+  }
+  .hanging-tag .hole{width:8px;height:8px;border-radius:50%;background:var(--paper); border:1.5px solid var(--ink); margin:0 auto 4px;}
+  @media (max-width:760px){.hanging-tag{display:none;}}
+
+  textarea.big{
+    width:100%; min-height:104px; resize:vertical; font-family:inherit; font-size:13.5px;
+    line-height:1.7; border:none; border-radius:8px; padding:8px 2px;
+    background:transparent; outline:none;
+    background-image:repeating-linear-gradient(to bottom, transparent, transparent 27px, #d7dbe4 28px);
+  }
+
+  table.obs{width:100%; border-collapse:collapse;}
+  table.obs th{
+    text-align:left; font-size:11px; text-transform:none; letter-spacing:.01em;
+    color:#4a2e97; padding:6px 8px; border-bottom:2px solid #d7cffb; font-family:'Baloo 2',sans-serif;
+    background:#f2effe;
+  }
+  table.obs td{padding:3px 6px; border-bottom:1px solid #ece9f9;}
+  table.obs input{border:none; background:transparent; width:100%; font-size:13px; padding:7px 6px; border-radius:6px; font-family:inherit; color:var(--ink);}
+  table.obs input:focus{outline:2px solid var(--purple); background:#faf9ff;}
+
+  .img-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .drop{
+    border:2px dashed #b9e8d4; border-radius:10px; min-height:170px; background:#fbfffd;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; padding:12px; text-align:center; cursor:pointer; position:relative; overflow:hidden;
+  }
+  .drop-label{font-size:12px; font-weight:700; color:var(--ink); margin-bottom:4px; font-family:'Baloo 2',sans-serif;}
+  .drop.has-img{border-style:solid; border-color:var(--green);}
+  .drop span.lbl{font-size:11.5px; font-weight:700; color:var(--muted);}
+  .drop img{max-width:100%; max-height:190px; object-fit:contain; border-radius:6px;}
+  .drop input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer;}
+  .drop .hint{font-size:11px; color:var(--muted);}
+  .drop .clear{
+    position:absolute; top:6px; right:6px; background:var(--ink); color:#fff;
+    border:none; border-radius:50%; width:22px;height:22px; font-size:12px; cursor:pointer;
+    display:none; align-items:center; justify-content:center; z-index:2;
+  }
+  .drop.has-img .clear{display:flex;}
+
+  .analysis{display:grid; grid-template-columns:1fr 1px 1fr; gap:20px; align-items:start;}
+  .analysis .divider{background:#d3ecfc; align-self:stretch;}
+  @media (max-width:640px){.analysis{grid-template-columns:1fr;} .analysis .divider{display:none;}}
+  .q{margin-bottom:12px;}
+  .q label.qtitle{display:block; font-size:13.5px; font-weight:700; margin-bottom:6px;}
+  textarea.small{
+    width:100%; min-height:48px; font-family:inherit; font-size:13.5px; border:none;
+    padding:4px 2px; background:transparent; resize:vertical;
+    background-image:repeating-linear-gradient(to bottom, transparent, transparent 25px, #d7dbe4 26px);
+  }
+  .radio-row{display:flex; gap:16px; font-size:13.5px; flex-wrap:wrap;}
+  .radio-row label{display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:600;}
+
+  table.eval{width:100%; border-collapse:collapse;}
+  table.eval th{
+    font-size:11px; color:#4a2e97; text-align:center; padding:7px 6px; border-bottom:2px solid #d7cffb;
+    font-family:'Baloo 2',sans-serif; background:#f2effe;
+  }
+  table.eval th:first-child{text-align:left;}
+  table.eval td{padding:8px 6px; border-bottom:1px solid #ece9f9; font-size:13.5px; text-align:center;}
+  table.eval td:first-child{text-align:left;}
+  table.eval input[type=radio]{width:16px;height:16px; accent-color:var(--purple);}
+
+  /* Footer */
+  .footer-banner{
+    background:var(--navy); color:#fff; text-align:center; border-radius:999px;
+    padding:14px 24px; margin:24px 0 10px; font-family:'Baloo 2', sans-serif; font-weight:600;
+    font-style:italic; font-size:15.5px;
+  }
+  .foot-row{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; padding:0 6px;}
+  .foot-tag{
+    background:#fffdf6; border:2px solid var(--ink); border-radius:2px 10px 10px 10px;
+    padding:10px 16px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px;
+    line-height:1.55; box-shadow:2px 3px 4px rgba(0,0,0,.1); display:flex; align-items:center; gap:8px;
+  }
+  .foot-tag svg{width:24px;height:24px;flex:none;}
+  .foot-tag.left{transform:rotate(-3deg);}
+  .foot-tag.right{transform:rotate(2deg);}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    position:fixed; left:0; right:0; bottom:0; background:var(--panel);
+    border-top:2px solid #d8d2c4; padding:12px 16px; display:flex;
+    justify-content:center; align-items:center; gap:14px; z-index:50; flex-wrap:wrap;
+  }
+  .btn{
+    background:var(--navy); color:#fff; border:none; border-radius:10px;
+    padding:12px 22px; font-weight:800; font-size:14.5px; cursor:pointer; font-family:'Baloo 2',sans-serif;
+    display:flex; align-items:center; gap:8px;
+  }
+  .btn:disabled{opacity:.6; cursor:wait;}
+  .toolbar .note-txt{font-size:12px; color:var(--muted); max-width:420px;}
+  .status{font-size:12.5px; font-weight:700;}
+  .status.ok{color:var(--green);}
+  .status.err{color:#c62828;}
+</style>
+</head>
+<body>
+
+<!-- Sprite of hand-drawn style line icons -->
+<svg width="0" height="0" style="position:absolute">
+<defs>
+  <symbol id="ic-backpack" viewBox="0 0 24 24"><path d="M7 8V6a5 5 0 0 1 10 0v2"/><rect x="5" y="8" width="14" height="13" rx="3"/><path d="M9 12h6M9 16h6"/><path d="M9 8V5"/></symbol>
+  <symbol id="ic-plant" viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13c-4 0-6-2.5-6-6 4 0 6 2 6 6Z"/><path d="M12 11c3.2 0 5-2 5-5-3.6 0-5 1.8-5 5Z"/><path d="M7 21h10l-1-6H8l-1 6Z"/></symbol>
+  <symbol id="ic-basket" viewBox="0 0 24 24"><path d="M4 10h16l-1.4 9.2a2 2 0 0 1-2 1.8H7.4a2 2 0 0 1-2-1.8L4 10Z"/><path d="M8 10 9 4h6l1 6"/><path d="M9 13v4M12 13v4M15 13v4"/></symbol>
+  <symbol id="ic-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/><path d="M2.5 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L21 7H6"/></symbol>
+  <symbol id="ic-tag" viewBox="0 0 24 24"><path d="M3 11.5 12.5 2H20a1 1 0 0 1 1 1v7.5l-9.5 9.5a1.5 1.5 0 0 1-2 0L3 13.5a1.5 1.5 0 0 1 0-2Z"/><circle cx="16" cy="7" r="1.5"/></symbol>
+  <symbol id="ic-star" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.9 6.1 6.6.7-4.9 4.6 1.3 6.6L12 17.2 6.1 20.5l1.3-6.6-4.9-4.6 6.6-.7L12 2.5Z"/></symbol>
+  <symbol id="ic-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+  <symbol id="ic-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></symbol>
+  <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 6.2l1.7 1.7M18.1 16.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 17.8l1.7-1.7M18.1 7.9l1.7-1.7"/></symbol>
+  <symbol id="ic-pencil" viewBox="0 0 24 24"><path d="m4 20 1-4.2L15.8 5 19 8.2 8.2 19 4 20Z"/><path d="m13.5 6.5 4 4"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.3-4.3"/></symbol>
+  <symbol id="ic-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m4 18 5.5-5.5a2 2 0 0 1 2.8 0L17 17M15 15l1.7-1.7a2 2 0 0 1 2.8 0L21 15"/></symbol>
+  <symbol id="ic-bars" viewBox="0 0 24 24"><path d="M4 20V12M10 20V6M16 20v-9M22 20H2"/></symbol>
+  <symbol id="ic-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/></symbol>
+  <symbol id="ic-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3.5" rx="1"/><path d="m8.5 12.5 2 2 4-4.2"/></symbol>
+  <symbol id="ic-shop" viewBox="0 0 24 24"><path d="M4 21h16"/><path d="M6 21V9M18 21V9M3 9l2-5h14l2 5"/><path d="M3 9h18"/><rect x="9.5" y="13" width="5" height="8"/></symbol>
+</defs>
+</svg>
+
+<div class="wrap" id="capture-area">
+
+  <div class="header-zone">
+    <div class="corner left">
+      <svg class="icon" style="color:#2c3e6b"><use href="#ic-backpack"/></svg>
+      <svg class="icon" style="color:#2fa06b; margin-left:4px;"><use href="#ic-plant"/></svg>
+      <div class="stickynote">Un magasin bien tenu, des clients satisfaits !</div>
+    </div>
+    <div class="corner right">
+      <svg class="icon" style="color:#e0417a"><use href="#ic-basket"/></svg>
+      <div class="stickynote">Observer<br>Analyser<br>Proposer<br>Améliorer ! 🙂</div>
+    </div>
+
+    <span class="pill">FICHE ÉLÈVE — 1EPC</span>
+
+    <div class="masthead">
+      <h1>SOS Rayon : améliorer un rayon de magasin<br>avec ChatGPT Image</h1>
+      <div class="teacher">Enseignante&nbsp;: <b>LEGER Isabelle</b></div>
+      <div class="identity">
+        <div class="field"><label>Nom</label><input type="text" id="f-nom" placeholder="Nom de l'élève"></div>
+        <div class="field"><label>Prénom</label><input type="text" id="f-prenom" placeholder="Prénom"></div>
+        <div class="field"><label>Classe</label><input type="text" id="f-classe" value="1EPC"></div>
+        <div class="field"><label>Date</label><input type="date" id="f-date"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card pink">
+      <div class="card-head"><svg class="icon"><use href="#ic-target"/></svg><div class="num">1</div><h2>Objectifs</h2></div>
+      <div class="card-body">
+        <ul class="plain">
+          <li>Observer un rayon de vente</li>
+          <li>Repérer des anomalies</li>
+          <li>Proposer des améliorations professionnelles</li>
+          <li>Rédiger un prompt clair</li>
+          <li>Analyser le résultat obtenu</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card blue">
+      <div class="card-head"><svg class="icon"><use href="#ic-briefcase"/></svg><div class="num">2</div><h2>Situation professionnelle</h2></div>
+      <div class="card-body">
+        <p class="txt">Vous travaillez dans un magasin. Votre responsable vous demande de réfléchir à l'amélioration d'un rayon mal présenté. Pour l'aider à visualiser vos idées, vous allez utiliser ChatGPT Image.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card green" style="margin-bottom:18px;">
+    <div class="hanging-tag"><div class="hole"></div>DES RAYONS<br>PLUS ATTRACTIFS<br>POUR TOUS !</div>
+    <div class="card-head"><svg class="icon"><use href="#ic-gear"/></svg><div class="num">3</div><h2>Étapes de travail</h2></div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step"><span class="chip">1</span>Créer l'image d'un rayon mal organisé</div>
+        <div class="step"><span class="chip">2</span>Observer les problèmes</div>
+        <div class="step"><span class="chip">3</span>Proposer des solutions</div>
+        <div class="step"><span class="chip">4</span>Générer une version améliorée</div>
+        <div class="step"><span class="chip">5</span>Comparer et analyser le résultat</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card orange">
+      <div class="card-head"><svg class="icon"><use href="#ic-pencil"/></svg><div class="num">4</div><h2>Mon prompt pour créer le rayon en désordre</h2></div>
+      <div class="card-body"><textarea class="big" id="f-prompt1" placeholder="Écrivez ici le prompt utilisé pour générer l'image du rayon mal organisé..."></textarea></div>
+    </div>
+    <div class="card rose">
+      <div class="card-head"><svg class="icon"><use href="#ic-pencil"/></svg><div class="num">6</div><h2>Mon prompt d'amélioration</h2></div>
+      <div class="card-body"><textarea class="big" id="f-prompt2" placeholder="Écrivez ici le prompt utilisé pour générer l'image du rayon amélioré..."></textarea></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card purple">
+      <div class="card-head"><svg class="icon"><use href="#ic-search"/></svg><div class="num">5</div><h2>Mes observations</h2></div>
+      <div class="card-body">
+        <table class="obs">
+          <thead><tr><th>Problème observé</th><th>Pourquoi ?</th><th>Solution proposée</th></tr></thead>
+          <tbody id="obs-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card green">
+      <div class="card-head"><svg class="icon"><use href="#ic-image"/></svg><div class="num">7</div><h2>Mes images</h2></div>
+      <div class="card-body">
+        <div class="img-grid">
+          <label class="drop" id="drop1">
+            <button type="button" class="clear" data-target="drop1">✕</button>
+            <img style="display:none;">
+            <span class="drop-label">Image du rayon en désordre</span>
+            <span class="hint">Insérer l'image générée</span>
+            <input type="file" accept="image/*">
+          </label>
+          <label class="drop" id="drop2">
+            <button type="button" class="clear" data-target="drop2">✕</button>
+            <img style="display:none;">
+            <span class="drop-label">Image du rayon amélioré</span>
+            <span class="hint">Insérer l'image générée</span>
+            <input type="file" accept="image/*">
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card blue" style="margin-bottom:18px;">
+    <div class="card-head"><svg class="icon"><use href="#ic-bars"/></svg><div class="num">8</div><h2>Analyse</h2></div>
+    <div class="card-body">
+      <div class="analysis">
+        <div>
+          <div class="q"><label class="qtitle">1. Quelles améliorations sont visibles ?</label><textarea class="small"></textarea></div>
+          <div class="q">
+            <label class="qtitle">2. L'image respecte-t-elle vos consignes ?</label>
+            <div class="radio-row">
+              <label><input type="radio" name="q2" value="Oui"> Oui</label>
+              <label><input type="radio" name="q2" value="Partiellement"> Partiellement</label>
+              <label><input type="radio" name="q2" value="Non"> Non</label>
+            </div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div>
+          <div class="q"><label class="qtitle">3. Quelle consigne a été la mieux respectée ?</label><textarea class="small"></textarea></div>
+          <div class="q"><label class="qtitle">4. Que modifieriez-vous dans votre prompt ?</label><textarea class="small"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card yellow">
+      <div class="card-head"><svg class="icon"><use href="#ic-bulb"/></svg><div class="num">9</div><h2>Bilan professionnel</h2></div>
+      <div class="card-body">
+        <p class="txt" style="margin-bottom:6px;">Pourquoi un rayon bien tenu peut-il favoriser les ventes ?</p>
+        <textarea class="big" style="min-height:76px;"></textarea>
+      </div>
+    </div>
+    <div class="card purple">
+      <div class="card-head"><svg class="icon"><use href="#ic-clipboard"/></svg><div class="num">10</div><h2>Auto-évaluation</h2></div>
+      <div class="card-body">
+        <table class="eval">
+          <thead><tr><th>Je suis capable de…</th><th>Oui</th><th>Partiel.</th><th>Non</th></tr></thead>
+          <tbody id="eval-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-banner">« L'IA est un outil : c'est votre réflexion professionnelle qui fait la différence ! »</div>
+
+  <div class="foot-row">
+    <div class="foot-tag left"><svg style="color:#eaad19"><use href="#ic-tag"/></svg>PETITES AMÉLIORATIONS<br>GRANDS RÉSULTATS</div>
+    <div class="foot-tag right"><svg style="color:#2fa06b"><use href="#ic-shop"/></svg>Le commerce, un métier d'avenir !</div>
+  </div>
+
+</div>
+
+<div class="toolbar">
+  <button class="btn" id="download-btn">⬇ Télécharger mon PDF</button>
+  <span class="status" id="status"></span>
+  <span class="note-txt">Une fois le PDF enregistré, transmettez-le à votre enseignante (LEGER Isabelle).</span>
+</div>
+
+<script>
+  const obsBody = document.getElementById('obs-body');
+  for(let i=0;i<5;i++){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>`;
+    obsBody.appendChild(tr);
+  }
+
+  const evalItems = [
+    "Repérer des anomalies dans un rayon",
+    "Proposer des solutions adaptées",
+    "Rédiger un prompt clair",
+    "Analyser une image générée par l'IA"
+  ];
+  const evalBody = document.getElementById('eval-body');
+  evalItems.forEach((label, i)=>{
+    const tr = document.createElement('tr');
+    const name = 'eval'+i;
+    tr.innerHTML = `<td>${label}</td>
+      <td><input type="radio" name="${name}" value="Oui"></td>
+      <td><input type="radio" name="${name}" value="Partiellement"></td>
+      <td><input type="radio" name="${name}" value="Non"></td>`;
+    evalBody.appendChild(tr);
+  });
+
+  document.querySelectorAll('.drop').forEach(drop=>{
+    const input = drop.querySelector('input[type=file]');
+    const img = drop.querySelector('img');
+    const hint = drop.querySelector('.hint');
+    input.addEventListener('change', e=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ev=>{
+        img.src = ev.target.result;
+        img.style.display = 'block';
+        hint.style.display = 'none';
+        drop.classList.add('has-img');
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+  document.querySelectorAll('.clear').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.preventDefault(); e.stopPropagation();
+      const drop = document.getElementById(btn.dataset.target);
+      const img = drop.querySelector('img');
+      const input = drop.querySelector('input[type=file]');
+      const hint = drop.querySelector('.hint');
+      img.src=''; img.style.display='none'; input.value=''; hint.style.display='block';
+      drop.classList.remove('has-img');
+    });
+  });
+
+  const statusEl = document.getElementById('status');
+  const btn = document.getElementById('download-btn');
+  function setStatus(text, kind){
+    statusEl.textContent = text;
+    statusEl.className = 'status ' + (kind||'');
+  }
+
+  btn.addEventListener('click', async ()=>{
+    btn.disabled = true;
+    setStatus('Génération du PDF…', '');
+    document.querySelectorAll('.clear').forEach(b=>b.style.visibility='hidden');
+    try{
+      const target = document.getElementById('capture-area');
+      const canvas = await html2canvas(target, {scale: 2, backgroundColor: '#fbf8f2', useCORS:true});
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p','mm','a4');
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const imgW = pageW;
+      const imgH = canvas.height * imgW / canvas.width;
+
+      let heightLeft = imgH;
+      let position = 0;
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+      pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+      heightLeft -= pageH;
+      while(heightLeft > 0){
+        position = heightLeft - imgH;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+        heightLeft -= pageH;
+      }
+
+      const nom = document.getElementById('f-nom').value.trim() || 'eleve';
+      const prenom = document.getElementById('f-prenom').value.trim() || '';
+      const filename = `SOS_Rayon_${nom}_${prenom}`.replace(/\s+/g,'_').replace(/_+$/,'') + '.pdf';
+
+      pdf.setProperties({
+        title: 'SOS Rayon - Fiche élève 1EPC',
+        author: 'LEGER Isabelle',
+        subject: "Amélioration d'un rayon de magasin avec ChatGPT Image"
+      });
+
+      const blob = pdf.output('blob');
+
+      // Use the claude.ai "downloads" capability when available (published artifact);
+      // otherwise (plain HTML file opened locally, sent by email, on an ENT, etc.)
+      // fall back to a normal browser download.
+      let downloads = null;
+      try{
+        if (typeof claude !== 'undefined' && claude && typeof claude.use === 'function'){
+          downloads = await claude.use('downloads');
+        }
+      }catch(e){ downloads = null; }
+
+      if(downloads){
+        try{
+          const res = await downloads.save({filename, data: blob});
+          setStatus(res.status === 'saved' ? '✓ PDF enregistré' : '✓ PDF envoyé', 'ok');
+        }catch(err){
+          if(err && err.code === 'declined'){
+            setStatus('Enregistrement annulé.', '');
+          }else{
+            setStatus("Erreur lors de l'enregistrement.", 'err');
+          }
+        }
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setStatus('✓ PDF téléchargé', 'ok');
+      }
+    }catch(err){
+      console.error(err);
+      setStatus('Erreur lors de la génération du PDF.', 'err');
+    }finally{
+      document.querySelectorAll('.clear').forEach(b=>b.style.visibility='visible');
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
